@@ -112,4 +112,99 @@ describe("filterBounties — token filter (#293)", () => {
   it("returns all bounties when the token filter is empty ('All Tokens')", () => {
     expect(filterBounties(tokenBounties, baseFilters)).toHaveLength(4);
   });
+
+  it('returns no bounties for a token that does not exist', () => {
+    const result = filterBounties(tokenBounties, { ...baseFilters, tokenFilter: 'ETH' });
+    expect(result).toEqual([]);
+  });
+
+  it('handles undefined tokenSymbol gracefully', () => {
+    const bounties = [
+      mockBounty({ id: '1', tokenSymbol: undefined }),
+      mockBounty({ id: '2', tokenSymbol: 'XLM' }),
+    ];
+    const result = filterBounties(bounties, { ...baseFilters, tokenFilter: 'XLM' });
+    expect(result.map((b) => b.id)).toEqual(['2']);
+  });
+
+  it('trims whitespace from token filter', () => {
+    const result = filterBounties(tokenBounties, { ...baseFilters, tokenFilter: '  xlm  ' });
+    expect(result.map((b) => b.id).sort()).toEqual(['1', '3']);
+  });
+
+  it('handles expired bounties in token filter', () => {
+    const bounties = [
+      ...tokenBounties,
+      mockBounty({ id: '5', tokenSymbol: 'XLM', status: 'expired' }),
+    ];
+    const result = filterBounties(bounties, { ...baseFilters, tokenFilter: 'XLM' });
+    expect(result).toHaveLength(3);
+  });
+});
+
+import { getUniqueRepos, getRepoMetrics } from './utils';
+
+describe('getUniqueRepos', () => {
+  it('returns sorted unique repos from bounties', () => {
+    const bounties = [
+      mockBounty({ repo: 'z-repo' }),
+      mockBounty({ repo: 'a-repo' }),
+      mockBounty({ repo: 'z-repo' }),
+    ];
+    expect(getUniqueRepos(bounties)).toEqual(['a-repo', 'z-repo']);
+  });
+
+  it('returns an empty array for no bounties', () => {
+    expect(getUniqueRepos([])).toEqual([]);
+  });
+});
+
+describe('getRepoMetrics', () => {
+  const bounties = [
+    mockBounty({ id: '1', repo: 'acme/widget', status: 'open', amount: 100 }),
+    mockBounty({ id: '2', repo: 'acme/widget', status: 'released', amount: 200 }),
+    mockBounty({ id: '3', repo: 'acme/widget', status: 'reserved', amount: 50 }),
+    mockBounty({ id: '4', repo: 'other/repo', status: 'open', amount: 75 }),
+  ];
+
+  it('computes correct metrics for a repo', () => {
+    const m = getRepoMetrics(bounties, 'acme/widget');
+    expect(m.totalBounties).toBe(3);
+    expect(m.openBounties).toBe(1);
+    expect(m.reservedBounties).toBe(1);
+    expect(m.submittedBounties).toBe(0);
+    expect(m.releasedBounties).toBe(1);
+    expect(m.refundedBounties).toBe(0);
+    expect(m.expiredBounties).toBe(0);
+    expect(m.totalFunded).toBe(350);
+    expect(m.totalPaidOut).toBe(200);
+  });
+
+  it('returns zeros for a repo with no bounties', () => {
+    const m = getRepoMetrics(bounties, 'nonexistent');
+    expect(m.totalBounties).toBe(0);
+    expect(m.totalFunded).toBe(0);
+    expect(m.totalPaidOut).toBe(0);
+  });
+});
+
+describe('filterBounties — status filter', () => {
+  const bounties = [
+    mockBounty({ id: '1', status: 'open' }),
+    mockBounty({ id: '2', status: 'reserved' }),
+    mockBounty({ id: '3', status: 'submitted' }),
+    mockBounty({ id: '4', status: 'released' }),
+    mockBounty({ id: '5', status: 'refunded' }),
+    mockBounty({ id: '6', status: 'expired' }),
+  ];
+
+  it('filters by each status', () => {
+    expect(filterBounties(bounties, { ...baseFilters, statusFilter: 'open' })).toHaveLength(1);
+    expect(filterBounties(bounties, { ...baseFilters, statusFilter: 'released' })).toHaveLength(1);
+    expect(filterBounties(bounties, { ...baseFilters, statusFilter: 'expired' })).toHaveLength(1);
+  });
+
+  it('returns all when status is "all"', () => {
+    expect(filterBounties(bounties, { ...baseFilters, statusFilter: 'all' })).toHaveLength(6);
+  });
 });
