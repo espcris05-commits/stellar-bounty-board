@@ -75,6 +75,7 @@ function requestContextMiddleware(req: Request, res: Response, next: NextFunctio
 
 export const app = express();
 
+app.get("/api/bounties/expiring-soon", (req,res) => { res.json({ data:[], note:"Endpoint for #369" }); });
 app.use(cors(buildCorsOptions()));
 
 // Parse JSON bodies; capture raw body for webhook signature verification
