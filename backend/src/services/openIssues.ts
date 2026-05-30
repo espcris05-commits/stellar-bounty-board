@@ -45,3 +45,14 @@ export function listOpenIssues(): OpenIssue[] {
   return openIssues;
 }
 
+
+// Type guard for runtime validation
+export function isValidOpenIssue(obj: unknown): obj is OpenIssue {
+  if (!obj || typeof obj !== "object") return false;
+  const o = obj as Record<string, unknown>;
+  return typeof o.id === "string" && typeof o.title === "string" && Array.isArray(o.labels) && typeof o.summary === "string" && ["starter", "core", "advanced"].includes(o.impact as string);
+}
+
+export function filterByImpact(issues: OpenIssue[], impact: OpenIssue["impact"]): OpenIssue[] {
+  return issues.filter(i => i.impact === impact);
+}
