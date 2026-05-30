@@ -345,3 +345,13 @@ chmod +x .husky/pre-commit
 We value quality contributions and clear communication. If this guide is missing something, a PR improving it is one of the most valuable contributions you can make.
 
 Happy coding! 🚀
+
+## Commit Convention
+
+We use [Conventional Commits](https://www.conventionalcommits.org/):
+- `feat:` New feature
+- `fix:` Bug fix
+- `docs:` Documentation
+- `chore:` Maintenance
+- `test:` Testing
+- `refactor:` Code restructuring
