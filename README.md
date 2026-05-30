@@ -148,3 +148,15 @@ Suggested first issues:
 - GitHub webhook sync for PR state
 - Event indexer for contract payouts
 - Postgres persistence and audit log support
+
+## API Quick Start
+
+```bash
+# List bounties
+curl https://api.example.com/bounties
+
+# Create bounty
+curl -X POST https://api.example.com/bounties \
+  -H "Content-Type: application/json" \
+  -d '{"title":"My Bounty","amount":100,"token":"USDC"}'
+```
