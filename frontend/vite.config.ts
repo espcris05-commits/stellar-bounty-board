@@ -34,6 +34,7 @@ function cspPlugin(): Plugin {
 }
 
 export default defineConfig(({ mode }) => ({
+    test: { coverage: { thresholds: { lines: 60, branches: 50 } } },
   plugins: [
     react(),
     cspPlugin(),
