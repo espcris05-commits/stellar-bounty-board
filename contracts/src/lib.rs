@@ -531,6 +531,10 @@ impl StellarBountyBoardContract {
             .get(&DataKey::NextBountyId)
             .unwrap_or(0)
     }
+
+    pub fn get_version(env: Env) -> String {
+        String::from_slice(&env, env!(\"CARGO_PKG_VERSION\"))
+    }
 }
 
 fn read_bounty(env: &Env, bounty_id: u64) -> Bounty {
