@@ -112,3 +112,26 @@ export function getCache(): CacheAdapter {
 export function __resetCacheForTests(): void {
   instance = null;
 }
+export class MemoryCache<T> {
+  private cache = new Map<string, { data: T; expiresAt: number }>();
+  
+  constructor(private ttlMs: number = 5000) {}
+  
+  get(key: string): T | null {
+    const entry = this.cache.get(key);
+    if (!entry) return null;
+    if (Date.now() > entry.expiresAt) {
+      this.cache.delete(key);
+      return null;
+    }
+    return entry.data;
+  }
+  
+  set(key: string, data: T): void {
+    this.cache.set(key, { data, expiresAt: Date.now() + this.ttlMs });
+  }
+  
+  clear(): void {
+    this.cache.clear();
+  }
+}
