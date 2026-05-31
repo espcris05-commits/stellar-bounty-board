@@ -179,7 +179,7 @@ export default function BountyDetailPage({
           <div className="bounty-detail__content">
             <div className="bounty-detail__hero">
               {avatarUrl && (
-                <img
+                <img loading="lazy"
                   className="repo-avatar"
                   src={avatarUrl}
                   alt={owner}
