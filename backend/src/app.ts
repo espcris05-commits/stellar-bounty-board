@@ -406,3 +406,6 @@ app.get("/api/leaderboard", (req: Request, res: Response) => {
     sendError(res, req, error);
   }
 });
+
+import compression from 'compression';
+app.use(compression());
