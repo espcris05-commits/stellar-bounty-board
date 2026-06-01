@@ -77,6 +77,9 @@ export const app = express();
 
 app.use(cors(buildCorsOptions()));
 
+// Compression before routes — must be early to intercept responses
+app.use(compression());
+
 // Parse JSON bodies; capture raw body for webhook signature verification
 app.use(
   express.json({
@@ -407,5 +410,3 @@ app.get("/api/leaderboard", (req: Request, res: Response) => {
   }
 });
 
-import compression from 'compression';
-app.use(compression());
